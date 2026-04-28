@@ -1,73 +1,171 @@
-项目概述
-校园食堂智能点评与推荐系统——Spring Boot + Vue.js食堂评测与推荐系统，支持用户认证、浏览菜品、评测、收藏夹和个性化推荐。
+# 校园食堂智能点评与推荐系统
 
-构建命令
-后端（食堂系统/后端/）
-mvn spring-boot:run              # Start server on port 8080
-mvn test                         # Run all tests
-mvn test -Dtest=ClassName        # Run single test class
-mvn clean package                # Build JAR
-前端（食堂系统/前端/）
-npm install                      # Install dependencies
-npm run dev                      # Start dev server on port 3001
-npm run build                    # Production build
-数据库设置
--- Execute in MySQL before first run
+## 项目简介
+
+本系统是一个基于 Spring Boot + Vue.js 的校园食堂智能点评与推荐系统，实现了用户注册登录、菜品浏览与搜索、点评评分、个性化推荐、食堂数据看板等功能。
+
+## 技术栈
+
+### 后端
+- Java 17
+- Spring Boot 3.2.0
+- MyBatis-Plus 3.5.5
+- MySQL 8.0
+- JWT 认证
+
+### 前端
+- Vue 3
+- Vite 5
+- Element Plus
+- Pinia
+- Axios
+
+## 项目结构
+
+```
+canteen-system/
+├── backend/                    # 后端项目
+│   ├── src/main/java/
+│   │   └── com/canteen/system/
+│   │       ├── controller/     # 控制器层
+│   │       ├── service/        # 服务层
+│   │       ├── mapper/         # 数据访问层
+│   │       ├── entity/         # 实体类
+│   │       ├── dto/            # 数据传输对象
+│   │       ├── config/         # 配置类
+│   │       ├── util/           # 工具类
+│   │       └── exception/      # 异常处理
+│   └── src/main/resources/
+│       ├── application.yml     # 配置文件
+|        |
+│       └── db/init.sql         # 数据库初始化脚本
+├── frontend/                   # 前端项目
+│   ├── src/
+│   │   ├── views/              # 页面组件
+│   │   ├── router/             # 路由配置
+│   │   ├── stores/             # 状态管理
+│   │   └── utils/              # 工具函数
+│   └── package.json
+└── uploads/                    # 上传文件目录
+```
+
+## 快速开始
+
+### 1. 环境准备
+
+确保已安装以下软件：
+- JDK 17+
+- MySQL 8.0+
+- Node.js 18+
+- Maven 3.6+
+
+### 2. 数据库配置
+
+1. 创建数据库并导入初始数据：
+```sql
+-- 在 MySQL 中执行
 source e:/毕设/canteen-system/backend/src/main/resources/db/init.sql
-建筑
-后端结构（Spring Boot 3.2.0 + MyBatis-Plus）
-backend/src/main/java/com/canteen/system/
-├── controller/     # REST endpoints (@RestController)
-├── service/impl/   # Business logic layer
-├── mapper/         # MyBatis-Plus data access
-├── entity/         # Database entities (@TableName)
-├── dto/            # Data transfer objects (Result, PageResult, DTOs)
-├── config/         # JWT filter, Web config, MyBatis-Plus config
-├── annotation/     # Custom @RequireAdmin for authorization
-├── aspect/         # AOP aspects for @RequireAdmin
-├── util/           # JwtUtil, UserContext for auth
-└── exception/      # GlobalExceptionHandler
-前端结构（Vue 3 + Vite + Pinia）
-frontend/src/
-├── views/          # Page components (Home, Login, Dish, etc.)
-├── views/admin/    # Admin panel (Dishes, Reviews, Users)
-├── router/         # Vue Router with auth guards (requiresAuth, requiresAdmin)
-├── stores/user.js  # Pinia store: user, token, isAdmin, login/logout
-└── utils/api.js    # Axios instance with JWT interceptor
-关键模式
-API响应格式：
+```
 
-Result.success(data)              // { code: 200, message: "操作成功", data }
-Result.error("错误信息")           // { code: 500, message: "错误信息", data: null }
-PageResult.of(records, total, current, size)  // Paginated response
-用户认证：
+或者手动在 Navicat 中执行 init.sql 文件。
 
-JWT 存储在 localStorage，发送方式为Authorization: Bearer <token>
-UserContext.getCurrentUserId()在后端检索当前用户
-@RequireAdmin注释限制端点只能担任管理员角色
-前端认证守卫：
+2. 修改数据库配置（如需要）：
+编辑 `backend/src/main/resources/application.yml`，修改数据库连接信息：
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/canteen_db?...
+    username: root
+    password: root  # 修改为你的密码
+```
 
-// Route meta: { requiresAuth: true, requiresAdmin: true }
-router.beforeEach checks useUserStore().isLoggedIn and .isAdmin
-用户角色：
+### 3. 启动后端
 
-角色0：普通用户
-角色1：系统管理员（系统管理员）
-职位2：食堂管理员（食堂管理员）
-配置
-后端端口：8080
-前端端口：3001（代理/api和/uploads到后端）
-数据库：MySQL 8.0，canteen_db
-Redis：localhost：6379（可选，用于缓存）
-文件上传： e:/毕设/canteen-system/uploads/
-测试账号
-用户名	密码	职责
-行政	123456	系统管理员
-学生1	123456	学生
-canteen_admin	123456	食堂管理
-开发笔记
-Vue文件导入顺序：Vue API → Router/Pinia → Element Plus → 利用 → 样式
-所有Vue组件都使用<script setup>语法
-形式验证：与螺旋桨的使用el-formrules
-API调用：使用实例中的 ，而不是原始的公理apiutils/api.js
-龙目岛有——使用，等等。@Data@RequiredArgsConstructor
+```bash
+cd e:/毕设/canteen-system/backend
+mvn spring-boot:run
+```
+
+后端服务将在 http://localhost:8080 启动。
+
+### 4. 启动前端
+
+```bash
+cd e:/毕设/canteen-system/frontend
+npm install
+npm run dev
+```
+
+前端服务将在 http://localhost:3002 启动。
+
+### 5. 访问系统
+
+打开浏览器访问 http://localhost:3002
+
+## 测试账号
+
+| 用户名 | 密码 | 角色 |
+|--------|------|------|
+| admin | 123456 | 系统管理员 |
+| student1 | 123456 | 学生 |
+| canteen_admin | 123456 | 食堂管理员 |
+
+> 注意：初始密码需要在数据库中设置 BCrypt 加密后的值。首次使用请先注册新用户。
+
+## 功能模块
+
+### 用户端
+- 用户注册与登录
+- 食堂浏览
+- 菜品搜索与筛选
+- 菜品详情查看
+- 评价与评分
+- 收藏菜品
+- 个人中心
+- 个性化推荐
+
+### 管理端
+- 数据看板
+- 菜品管理
+- 评价管理
+- 用户管理
+
+## API 接口
+
+### 认证相关
+- POST /api/auth/login - 登录
+- POST /api/auth/register - 注册
+- GET /api/auth/info - 获取当前用户信息
+
+### 菜品相关
+- GET /api/dishes - 菜品列表
+- GET /api/dishes/{id} - 菜品详情
+- GET /api/dishes/top - 热门菜品
+- GET /api/dishes/recommend - 个性化推荐
+
+### 评价相关
+- POST /api/reviews - 提交评价
+- GET /api/reviews/dish/{dishId} - 获取菜品评价
+
+### 其他
+- GET /api/canteens - 食堂列表
+- GET /api/windows/canteen/{canteenId} - 窗口列表
+- GET /api/dashboard - 数据看板
+
+## 开发说明
+
+### 推荐算法
+系统采用协同过滤算法实现个性化推荐：
+1. 记录用户行为（浏览、收藏、评分、评论）
+2. 基于用户行为相似度计算推荐分数
+3. 为用户生成个性化菜品推荐列表
+
+### 文件上传
+用户平价上传的图片保存在 `uploads/` 目录下，通过 `/uploads/{filename}` 访问。
+
+## 注意事项
+
+1. 确保 MySQL 服务已启动
+2. 确保后端服务先于前端启动
+3. 首次运行需要初始化数据库
+4. 生产环境请修改 JWT 密钥和数据库密码
