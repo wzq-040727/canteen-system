@@ -21,6 +21,6 @@ public class CanteenController {
     
     @GetMapping("/{id}")
     public Result<Canteen> getById(@PathVariable Long id) {
-        return Result.success(canteenService.getById(id));
+        return Result.success(canteenService.findById(id));
     }
 }

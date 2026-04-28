@@ -96,11 +96,11 @@ npm install
 npm run dev
 ```
 
-前端服务将在 http://localhost:3002 启动。
+前端服务将在 http://localhost:3001 启动。
 
 ### 5. 访问系统
 
-打开浏览器访问 http://localhost:3002
+打开浏览器访问 http://localhost:3001
 
 ## 测试账号
 

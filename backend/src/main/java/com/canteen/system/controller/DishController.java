@@ -23,6 +23,7 @@ public class DishController {
         return Result.success(dishService.queryDishes(queryDTO));
     }
     
+    //菜品详情接口：根据菜品ID查询菜品详情，同时记录用户行为（点击）,behavior_type=1,score=1.0
     @GetMapping("/{id}")
     public Result<Dish> getDetail(@PathVariable Long id) {
         Dish dish = dishService.getDetail(id);
@@ -33,6 +34,7 @@ public class DishController {
         return Result.success(dish);
     }
     
+    //菜品推荐接口：根据用户行为推荐Top-N菜品
     @GetMapping("/top")
     public Result<List<Dish>> getTopDishes(@RequestParam(defaultValue = "10") int limit) {
         return Result.success(dishService.getTopDishes(limit));

@@ -17,14 +17,18 @@ public interface UserBehaviorMapper extends BaseMapper<UserBehavior> {
             "</script>")
     List<Map<String, Object>> selectUserPreferences(@Param("userId") Long userId);
     
+    //协同过滤算法核心实现：根据用户行为推荐菜品
     @Select("<script>" +
-            "SELECT ub.dish_id, SUM(ub.score) as score FROM user_behavior ub " +
-            "WHERE ub.user_id IN " +
-            "(SELECT ub2.user_id FROM user_behavior ub2 WHERE ub2.dish_id IN " +
-            "(SELECT ub3.dish_id FROM user_behavior ub3 WHERE ub3.user_id = #{userId}) " +
-            "AND ub2.user_id != #{userId}) " +
-            "AND ub.dish_id NOT IN (SELECT ub4.dish_id FROM user_behavior ub4 WHERE ub4.user_id = #{userId}) " +
-            "GROUP BY ub.dish_id ORDER BY score DESC LIMIT #{limit}" +
-            "</script>")
-    List<Map<String, Object>> selectCollaborativeFiltering(@Param("userId") Long userId, @Param("limit") int limit);
+        "SELECT ub.dish_id, SUM(ub.score) as score FROM user_behavior ub " +
+        "WHERE ub.user_id IN " +
+        // 步骤1: 找出与当前用户有相似行为的其他用户
+        "(SELECT ub2.user_id FROM user_behavior ub2 WHERE ub2.dish_id IN " +
+        "(SELECT ub3.dish_id FROM user_behavior ub3 WHERE ub3.user_id = #{userId}) " +
+        "AND ub2.user_id != #{userId}) " +
+        // 步骤2: 排除用户已经交互过的菜品
+        "AND ub.dish_id NOT IN (SELECT ub4.dish_id FROM user_behavior ub4 WHERE ub4.user_id = #{userId}) " +
+        // 步骤3: 按分数排序，取Top-N
+        "GROUP BY ub.dish_id ORDER BY score DESC LIMIT #{limit}" +
+        "</script>")
+        List<Map<String, Object>> selectCollaborativeFiltering(@Param("userId") Long userId, @Param("limit") int limit);
 }

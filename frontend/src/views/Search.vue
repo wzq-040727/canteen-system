@@ -89,6 +89,7 @@ const search = async () => {
   const res = await api.get('/dishes', {
     params: {
       ...searchParams,
+      status: 1,
       pageNum: pageNum.value,
       pageSize: pageSize.value
     }

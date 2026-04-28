@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CanteenService extends IService<Canteen> {
     List<Canteen> listAll();
-    Canteen getById(Long id);
+    Canteen findById(Long id);
 }

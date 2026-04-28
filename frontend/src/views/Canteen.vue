@@ -81,6 +81,7 @@ const fetchDishes = async () => {
   const res = await api.get('/dishes', {
     params: {
       windowId: activeWindow.value,
+      status: 1,
       pageNum: 1,
       pageSize: 50
     }

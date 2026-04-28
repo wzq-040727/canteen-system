@@ -117,7 +117,7 @@ const fetchDishes = async () => {
   loading.value = true
   try {
     const res = await api.get('/dishes', {
-      params: { pageNum: pageNum.value, pageSize: pageSize.value, status: '' }
+      params: { pageNum: pageNum.value, pageSize: pageSize.value }
     })
     dishes.value = res.data?.records || []
     total.value = res.data?.total || 0

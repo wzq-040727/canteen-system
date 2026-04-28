@@ -5,14 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.canteen.system.dto.*;
-import com.canteen.system.entity.Dish;
 import com.canteen.system.entity.Review;
 import com.canteen.system.entity.ReviewLike;
-import com.canteen.system.entity.UserBehavior;
-import com.canteen.system.mapper.DishMapper;
 import com.canteen.system.mapper.ReviewLikeMapper;
 import com.canteen.system.mapper.ReviewMapper;
-import com.canteen.system.mapper.UserBehaviorMapper;
 import com.canteen.system.service.DishService;
 import com.canteen.system.service.ReviewService;
 import com.canteen.system.service.UserBehaviorService;
@@ -20,9 +16,15 @@ import com.canteen.system.util.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
 import java.util.List;
 
+/*
+//评价菜品服务：负责处理用户评价菜品的增删改查
+// 1. 添加评价菜品：根据用户ID、菜品ID、评价内容和评分，创建并保存新的评价记录
+// 2. 查询用户评价菜品：根据用户ID，查询该用户评价的所有菜品
+// 3. 查询评价菜品列表：根据评价时间降序排序返回评价记录
+// behavior_type=3,score=评价评分
+//*/
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review> implements ReviewService {

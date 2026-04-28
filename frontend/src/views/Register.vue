@@ -63,6 +63,16 @@ const validatePass = (rule, value, callback) => {
   }
 }
 
+const validateStudentId = (rule, value, callback) => {
+  if (!value) {
+    callback()
+  } else if (!/^\d{10,20}$/.test(value)) {
+    callback(new Error('学号格式不正确，正确格式为10-20位纯数字'))
+  } else {
+    callback()
+  }
+}
+
 const rules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -76,7 +86,8 @@ const rules = {
     { required: true, message: '请确认密码', trigger: 'blur' },
     { validator: validatePass, trigger: 'blur' }
   ],
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
+  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
+  studentId: [{ validator: validateStudentId, trigger: 'blur' }]
 }
 
 const handleRegister = async () => {

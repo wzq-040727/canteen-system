@@ -19,7 +19,7 @@ public class CanteenServiceImpl extends ServiceImpl<CanteenMapper, Canteen> impl
     }
     
     @Override
-    public Canteen getById(Long id) {
+    public Canteen findById(Long id) {
         return this.getOne(new LambdaQueryWrapper<Canteen>()
                 .eq(Canteen::getId, id)
                 .eq(Canteen::getStatus, 1));
