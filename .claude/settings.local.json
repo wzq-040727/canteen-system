@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(glm-plan-usage:usage-query-skill)",
+      "Bash(claude plugin *)",
+      "mcp__plugin_github_github__get_file_contents",
+      "mcp__web-reader__webReader"
+    ]
+  }
+}

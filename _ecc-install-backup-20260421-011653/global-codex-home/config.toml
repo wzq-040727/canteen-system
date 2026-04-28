@@ -1,0 +1,30 @@
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+[plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[windows]
+sandbox = "unelevated"
+
+[mcp_servers]
+
+[mcp_servers.context7]
+type = "stdio"
+command = "cmd"
+args = ["/c", "npx", "-y", "@upstash/context7-mcp"]
+
+[projects.'E:\毕设']
+trust_level = "trusted"
+
+[projects.'E:\everything-claude-code']
+trust_level = "trusted"
+
+[projects.'E:\4codex']
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
