@@ -31,4 +31,10 @@ public class Review {
     private String dishName;
     @TableField(exist = false)
     private Boolean isLiked;
+    @TableField(exist = false)
+    private String canteenName;
+    @TableField(exist = false)
+    private String windowName;
+    @TableField(exist = false)
+    private Integer floor;
 }

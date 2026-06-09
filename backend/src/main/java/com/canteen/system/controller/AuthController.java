@@ -41,4 +41,15 @@ public class AuthController {
         userService.updatePassword(oldPassword, newPassword);
         return Result.success();
     }
+
+    @GetMapping("/security-question")
+    public Result<String> getSecurityQuestion(@RequestParam String username) {
+        return Result.success(userService.getSecurityQuestion(username));
+    }
+
+    @PostMapping("/reset-password")
+    public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordDTO dto) {
+        userService.resetPassword(dto);
+        return Result.success();
+    }
 }

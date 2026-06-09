@@ -147,4 +147,9 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review> impleme
             this.updateById(review);
         }
     }
+
+    @Override
+    public List<Review> getRecentReviewsWithGroup(int limit) {
+        return baseMapper.selectRecentReviewsWithGroup(limit);
+    }
 }

@@ -3,6 +3,7 @@ package com.canteen.system.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @TableName("`window`")
@@ -16,6 +17,9 @@ public class Window {
     private String image;
     private Integer status;
     private Integer sortOrder;
+    private Integer floor;
+    private LocalTime openTime;
+    private LocalTime closeTime;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)

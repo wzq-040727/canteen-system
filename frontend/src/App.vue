@@ -1,11 +1,14 @@
 <template>
   <div class="app-container">
     <header class="header">
-      <h1 @click="$router.push('/')" style="cursor: pointer;">🍽️ 校园食堂智能点评与推荐系统</h1>
+      <h1 class="header-title" @click="$router.push('/')">🍽️ 校园食堂智能点评与推荐系统</h1>
+      <div class="header-search" @click="$router.push('/search')">
+        <el-icon><Search /></el-icon>
+      </div>
       <div class="header-right">
         <template v-if="userStore.isLoggedIn">
           <el-dropdown>
-            <span style="color: white; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span class="user-dropdown">
               <el-avatar :size="32" :src="userStore.user?.avatar">{{ userStore.user?.realName?.charAt(0) || userStore.user?.username?.charAt(0) }}</el-avatar>
               {{ userStore.user?.realName || userStore.user?.username }}
               <el-icon><ArrowDown /></el-icon>
@@ -28,7 +31,11 @@
       </div>
     </header>
     <main class="main-content">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
   </div>
 </template>
@@ -36,7 +43,7 @@
 <script setup>
 import { useUserStore } from './stores/user'
 import { useRouter } from 'vue-router'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, Search } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -46,3 +53,38 @@ const handleLogout = () => {
   router.push('/')
 }
 </script>
+
+<style scoped>
+.header-search {
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  transition: opacity 0.3s;
+}
+
+.header-search:hover {
+  opacity: 0.8;
+}
+
+.header-title {
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.header-title:hover {
+  opacity: 0.8;
+}
+
+.user-dropdown {
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.3s;
+}
+
+.user-dropdown:hover {
+  opacity: 0.8;
+}
+</style>

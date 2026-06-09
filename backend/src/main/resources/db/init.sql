@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS `user` (
     `avatar` VARCHAR(255) COMMENT '头像URL',
     `role` TINYINT DEFAULT 0 COMMENT '角色：0-学生，1-食堂管理员，2-系统管理员',
     `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-正常',
+    `security_question` VARCHAR(200) COMMENT '安全问题',
+    `security_answer` VARCHAR(200) COMMENT '安全问题答案',
     `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0-未删除，1-已删除',
@@ -32,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `canteen` (
     `image` VARCHAR(255) COMMENT '图片URL',
     `opening_hours` VARCHAR(100) COMMENT '营业时间',
     `status` TINYINT DEFAULT 1 COMMENT '状态：0-关闭，1-营业',
+    `floor_count` INT DEFAULT 1 COMMENT '楼层数',
     `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除'
@@ -47,6 +50,9 @@ CREATE TABLE IF NOT EXISTS `window` (
     `image` VARCHAR(255) COMMENT '图片URL',
     `status` TINYINT DEFAULT 1 COMMENT '状态：0-关闭，1-营业',
     `sort_order` INT DEFAULT 0 COMMENT '排序',
+    `floor` INT DEFAULT 1 COMMENT '所在楼层',
+    `open_time` TIME COMMENT '开始营业时间',
+    `close_time` TIME COMMENT '结束营业时间',
     `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除',
@@ -139,24 +145,39 @@ CREATE TABLE IF NOT EXISTS `review_like` (
     UNIQUE KEY `uk_user_review` (`user_id`, `review_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论点赞表';
 
+-- 食堂公告表
+CREATE TABLE IF NOT EXISTS `announcement` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '公告ID',
+    `canteen_id` BIGINT NOT NULL COMMENT '食堂ID',
+    `title` VARCHAR(200) NOT NULL COMMENT '公告标题',
+    `content` TEXT COMMENT '公告内容',
+    `is_top` TINYINT DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
+    `start_time` DATETIME COMMENT '生效开始时间',
+    `end_time` DATETIME COMMENT '生效结束时间',
+    `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除',
+    KEY `idx_canteen_id` (`canteen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='食堂公告表';
+
 -- 插入初始管理员数据
 INSERT INTO `user` (`username`, `password`, `real_name`, `role`, `status`) VALUES
 ('admin', '$2a$10$EqKcp1WFKVQISheBbxEY/ON8DC9tfZxZxQxEjYp2H4xHxP8xX8Hq', '系统管理员', 2, 1);
 
 -- 插入示例食堂数据
-INSERT INTO `canteen` (`name`, `location`, `description`, `opening_hours`, `status`) VALUES
-('第一食堂', '校园东区', '提供早中晚餐，菜品种类丰富', '07:00-21:00', 1),
-('第二食堂', '校园西区', '特色小吃为主，价格实惠', '07:00-21:00', 1),
-('第三食堂', '校园南区', '清真食堂，特色菜品', '07:00-21:00', 1);
+INSERT INTO `canteen` (`name`, `location`, `description`, `opening_hours`, `status`, `floor_count`) VALUES
+('第一食堂', '校园东区', '提供早中晚餐，菜品种类丰富', '07:00-21:00', 1, 2),
+('第二食堂', '校园西区', '特色小吃为主，价格实惠', '07:00-21:00', 1, 1),
+('第三食堂', '校园南区', '清真食堂，特色菜品', '07:00-21:00', 1, 1);
 
 -- 插入示例窗口数据
-INSERT INTO `window` (`canteen_id`, `name`, `cuisine_type`, `status`) VALUES
-(1, '川菜窗口', '川菜', 1),
-(1, '粤菜窗口', '粤菜', 1),
-(1, '面食窗口', '面食', 1),
-(2, '快餐窗口', '快餐', 1),
-(2, '小吃窗口', '小吃', 1),
-(3, '清真窗口', '清真', 1);
+INSERT INTO `window` (`canteen_id`, `name`, `cuisine_type`, `status`, `floor`) VALUES
+(1, '川菜窗口', '川菜', 1, 1),
+(1, '粤菜窗口', '粤菜', 1, 1),
+(1, '面食窗口', '面食', 1, 2),
+(2, '快餐窗口', '快餐', 1, 1),
+(2, '小吃窗口', '小吃', 1, 1),
+(3, '清真窗口', '清真', 1, 1);
 
 -- 插入示例菜品数据
 INSERT INTO `dish` (`window_id`, `canteen_id`, `name`, `price`, `category`, `taste`, `status`) VALUES

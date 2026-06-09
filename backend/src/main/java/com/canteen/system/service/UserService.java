@@ -10,4 +10,6 @@ public interface UserService extends IService<User> {
     User getCurrentUser();
     void updateUserInfo(User user);
     void updatePassword(String oldPassword, String newPassword);
+    String getSecurityQuestion(String username);
+    void resetPassword(ResetPasswordDTO dto);
 }

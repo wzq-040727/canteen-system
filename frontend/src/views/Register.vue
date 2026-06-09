@@ -24,6 +24,12 @@
         <el-form-item prop="phone">
           <el-input v-model="form.phone" placeholder="请输入手机号（选填）" size="large" prefix-icon="Phone" />
         </el-form-item>
+        <el-form-item prop="securityQuestion">
+          <el-input v-model="form.securityQuestion" placeholder="请设置安全问题（如：你的出生地是哪里？）" size="large" prefix-icon="QuestionFilled" />
+        </el-form-item>
+        <el-form-item prop="securityAnswer">
+          <el-input v-model="form.securityAnswer" placeholder="请输入安全答案" size="large" prefix-icon="Edit" />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" size="large" style="width: 100%;" @click="handleRegister" :loading="loading">注册</el-button>
         </el-form-item>
@@ -52,7 +58,9 @@ const form = reactive({
   confirmPassword: '',
   realName: '',
   studentId: '',
-  phone: ''
+  phone: '',
+  securityQuestion: '',
+  securityAnswer: ''
 })
 
 const validatePass = (rule, value, callback) => {
@@ -87,7 +95,9 @@ const rules = {
     { validator: validatePass, trigger: 'blur' }
   ],
   realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
-  studentId: [{ validator: validateStudentId, trigger: 'blur' }]
+  studentId: [{ validator: validateStudentId, trigger: 'blur' }],
+  securityQuestion: [{ required: true, message: '请设置安全问题', trigger: 'blur' }],
+  securityAnswer: [{ required: true, message: '请输入安全答案', trigger: 'blur' }]
 }
 
 const handleRegister = async () => {
@@ -99,7 +109,9 @@ const handleRegister = async () => {
       password: form.password,
       realName: form.realName,
       studentId: form.studentId || undefined,
-      phone: form.phone || undefined
+      phone: form.phone || undefined,
+      securityQuestion: form.securityQuestion,
+      securityAnswer: form.securityAnswer
     })
     ElMessage.success('注册成功，请登录')
     router.push('/login')

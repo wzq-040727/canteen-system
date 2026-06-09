@@ -34,4 +34,6 @@ public class Dish {
     private String windowName;
     @TableField(exist = false)
     private String canteenName;
+    @TableField(exist = false)
+    private Integer floor;
 }

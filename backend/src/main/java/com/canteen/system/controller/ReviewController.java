@@ -36,6 +36,11 @@ public class ReviewController {
     public Result<List<Review>> getRecentReviews(@RequestParam(defaultValue = "10") int limit) {
         return Result.success(reviewService.getRecentReviews(limit));
     }
+
+    @GetMapping("/recent-grouped")
+    public Result<List<Review>> getRecentReviewsGrouped(@RequestParam(defaultValue = "20") int limit) {
+        return Result.success(reviewService.getRecentReviewsWithGroup(limit));
+    }
     
     @PostMapping("/{reviewId}/like")
     public Result<Void> likeReview(@PathVariable Long reviewId) {

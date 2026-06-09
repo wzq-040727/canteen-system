@@ -98,6 +98,20 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.5</version>
         </dependency>
+
+        <!-- 显式指定 commons-io 版本，解决 POI 与 commons-fileupload 的版本冲突 -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+
+        <!-- Apache POI for Excel import -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
     </dependencies>
 
     <build>

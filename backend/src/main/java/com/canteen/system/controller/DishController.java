@@ -8,7 +8,9 @@ import com.canteen.system.service.UserBehaviorService;
 import com.canteen.system.util.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dishes")
@@ -33,6 +35,11 @@ public class DishController {
         }
         return Result.success(dish);
     }
+
+    @GetMapping("/{id}/smart-review")
+    public Result<DishSmartReviewVO> getSmartReview(@PathVariable Long id) {
+        return Result.success(dishService.getSmartReview(id));
+    }
     
     //菜品推荐接口：根据用户行为推荐Top-N菜品
     @GetMapping("/top")
@@ -47,6 +54,11 @@ public class DishController {
             return Result.success(dishService.getTopDishes(limit));
         }
         return Result.success(dishService.getRecommendations(userId, limit));
+    }
+
+    @GetMapping("/categories")
+    public Result<List<Map<String, Object>>> getCategoryStats() {
+        return Result.success(dishService.getCategoryStats());
     }
     
     @PostMapping
@@ -68,5 +80,11 @@ public class DishController {
     public Result<Void> deleteDish(@PathVariable Long id) {
         dishService.deleteDish(id);
         return Result.success();
+    }
+
+    @PostMapping("/import")
+    @RequireAdmin(message = "需要管理员权限才能导入菜品")
+    public Result<Map<String, Object>> importDishes(@RequestParam("file") MultipartFile file) {
+        return Result.success(dishService.importDishes(file));
     }
 }

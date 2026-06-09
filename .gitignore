@@ -67,3 +67,5 @@ gradle/
 # 包管理文件（保留package.json但忽略锁定文件）
 package-lock.json
 yarn.lock
+# Added by code-review-graph
+.code-review-graph/

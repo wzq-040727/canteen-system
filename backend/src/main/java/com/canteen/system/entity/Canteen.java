@@ -16,6 +16,7 @@ public class Canteen {
     private String image;
     private String openingHours;
     private Integer status;
+    private Integer floorCount;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)

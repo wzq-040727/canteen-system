@@ -7,4 +7,5 @@ public class CanteenManageUpdateDTO {
     private Long id;
     private String openingHours;
     private Integer status;
+    private Integer floorCount;
 }

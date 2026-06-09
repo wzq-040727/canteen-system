@@ -18,6 +18,8 @@ public class User {
     private String avatar;
     private Integer role;
     private Integer status;
+    private String securityQuestion;
+    private String securityAnswer;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)

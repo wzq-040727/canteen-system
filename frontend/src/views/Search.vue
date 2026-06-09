@@ -21,7 +21,10 @@
 
     <div class="card">
       <div class="card-title">搜索结果 (共 {{ total }} 条)</div>
-      <div class="dish-grid" v-if="dishes.length">
+      <div class="dish-grid" v-if="loading">
+        <DishCardSkeleton v-for="i in 6" :key="i" />
+      </div>
+      <div class="dish-grid" v-else-if="dishes.length">
         <div class="dish-card" v-for="dish in dishes" :key="dish.id" @click="$router.push(`/dish/${dish.id}`)">
           <img :src="getImageUrl(dish.image)" class="dish-image" @error="$event.target.src=defaultImage">
           <div class="dish-info">
@@ -56,7 +59,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api, { IMAGE_BASE } from '../utils/api'
+import api from '../utils/api'
+import { getImageUrl, defaultImage } from '../utils/helpers'
+import DishCardSkeleton from '../components/DishCardSkeleton.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -65,13 +70,7 @@ const canteens = ref([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(12)
-const defaultImage = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3E暂无图片%3C/text%3E%3C/svg%3E'
-
-const getImageUrl = (path) => {
-  if (!path) return defaultImage
-  if (path.startsWith('http')) return path
-  return IMAGE_BASE + path
-}
+const loading = ref(false)
 
 const searchParams = reactive({
   name: '',
@@ -86,16 +85,23 @@ const fetchCanteens = async () => {
 }
 
 const search = async () => {
-  const res = await api.get('/dishes', {
-    params: {
-      ...searchParams,
-      status: 1,
-      pageNum: pageNum.value,
-      pageSize: pageSize.value
-    }
-  })
-  dishes.value = res.data?.records || []
-  total.value = res.data?.total || 0
+  loading.value = true
+  try {
+    const res = await api.get('/dishes', {
+      params: {
+        ...searchParams,
+        status: 1,
+        pageNum: pageNum.value,
+        pageSize: pageSize.value
+      }
+    })
+    dishes.value = res.data?.records || []
+    total.value = res.data?.total || 0
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
 }
 
 const handlePageChange = () => {
@@ -105,6 +111,9 @@ const handlePageChange = () => {
 onMounted(() => {
   if (route.query.name) {
     searchParams.name = route.query.name
+  }
+  if (route.query.category) {
+    searchParams.category = route.query.category
   }
   fetchCanteens()
   search()

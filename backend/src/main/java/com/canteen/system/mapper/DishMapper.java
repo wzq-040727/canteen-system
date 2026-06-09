@@ -10,7 +10,7 @@ import java.util.Map;
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
     
-    @Select("SELECT d.*, w.name as window_name, c.name as canteen_name " +
+    @Select("SELECT d.*, w.name as window_name, w.floor, c.name as canteen_name " +
             "FROM dish d " +
             "LEFT JOIN `window` w ON d.window_id = w.id " +
             "LEFT JOIN canteen c ON d.canteen_id = c.id " +

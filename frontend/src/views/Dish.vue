@@ -1,23 +1,23 @@
 <template>
   <div>
     <div class="card">
-      <div style="display: flex; gap: 20px;">
-        <img :src="getImageUrl(dish?.image)" style="width: 300px; height: 200px; object-fit: cover; border-radius: 12px;" @error="$event.target.src=defaultImage">
-        <div style="flex: 1;">
-          <h2 style="margin-bottom: 15px;">{{ dish?.name }}</h2>
-          <div style="margin-bottom: 10px;">
-            <span class="dish-price" style="font-size: 24px;">¥{{ dish?.price }}</span>
+      <div class="dish-detail">
+        <img :src="getImageUrl(dish?.image)" class="dish-detail-image" @error="$event.target.src=defaultImage">
+        <div class="dish-detail-info">
+          <h2 class="dish-detail-name">{{ dish?.name }}</h2>
+          <div class="dish-detail-price">
+            <span class="dish-price price-large">¥{{ dish?.price }}</span>
           </div>
-          <div style="margin-bottom: 10px;">
-            <span class="rating-stars" style="font-size: 20px;">{{ '★'.repeat(Math.round(dish?.avgRating || 0)) }}{{ '☆'.repeat(5 - Math.round(dish?.avgRating || 0)) }}</span>
-            <span style="color: #999; margin-left: 10px;">{{ dish?.avgRating?.toFixed(1) || '暂无评分' }} ({{ dish?.ratingCount || 0 }}人评价)</span>
+          <div class="dish-detail-rating">
+            <span class="rating-stars rating-large">{{ '★'.repeat(Math.round(dish?.avgRating || 0)) }}{{ '☆'.repeat(5 - Math.round(dish?.avgRating || 0)) }}</span>
+            <span class="rating-count">{{ dish?.avgRating?.toFixed(1) || '暂无评分' }} ({{ dish?.ratingCount || 0 }}人评价)</span>
           </div>
-          <div class="dish-tags" style="margin-bottom: 15px;">
+          <div class="dish-tags dish-detail-tags">
             <span class="tag" v-if="dish?.category">{{ dish.category }}</span>
             <span class="tag" v-if="dish?.taste">{{ dish.taste }}</span>
           </div>
-          <p style="color: #666;">{{ dish?.description || '暂无描述' }}</p>
-          <div style="margin-top: 15px;">
+          <p class="dish-description">{{ dish?.description || '暂无描述' }}</p>
+          <div class="dish-actions">
             <el-button type="primary" :icon="isFavorite ? 'StarFilled' : 'Star'" @click="toggleFavorite">
               {{ isFavorite ? '已收藏' : '收藏' }}
             </el-button>
@@ -28,6 +28,14 @@
     </div>
 
     <div class="card">
+      <div class="card-title">智能点评</div>
+      <div v-if="smartReview?.summary" class="smart-review-content">
+        {{ smartReview.summary }}
+      </div>
+      <el-empty v-else description="智能点评生成中..." />
+    </div>
+
+    <div class="card">
       <div class="card-title">用户评价</div>
       <div v-if="reviews.length">
         <div class="review-item" v-for="review in reviews" :key="review.id">
@@ -35,8 +43,8 @@
             <div class="review-user">
               <div class="review-avatar">{{ (review.userName || '用户').charAt(0) }}</div>
               <div>
-                <div style="font-weight: 500;">{{ review.userName }}</div>
-                <div style="color: #999; font-size: 12px;">{{ formatTime(review.createdTime) }}</div>
+                <div class="review-username">{{ review.userName }}</div>
+                <div class="review-time">{{ formatTime(review.createdTime) }}</div>
               </div>
             </div>
             <div class="rating-stars">{{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5 - review.rating) }}</div>
@@ -45,7 +53,7 @@
           <div class="review-images" v-if="review.images">
             <img v-for="(img, index) in JSON.parse(review.images)" :key="index" :src="img" @click="previewImage(img)">
           </div>
-          <div style="margin-top: 10px;">
+          <div class="review-like">
             <el-button text size="small" :type="review.isLiked ? 'primary' : 'default'" @click="toggleLike(review)">
               <el-icon><Pointer /></el-icon>
               {{ review.likeCount || 0 }}
@@ -89,7 +97,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import api, { IMAGE_BASE } from '../utils/api'
+import api from '../utils/api'
+import { getImageUrl, formatTime, defaultImage } from '../utils/helpers'
 import { ElMessage } from 'element-plus'
 import { Pointer, Plus } from '@element-plus/icons-vue'
 
@@ -98,30 +107,18 @@ const router = useRouter()
 const userStore = useUserStore()
 const dish = ref(null)
 const reviews = ref([])
+const smartReview = ref(null)
 const isFavorite = ref(false)
 const showReviewDialog = ref(false)
 const submitting = ref(false)
 const fileList = ref([])
 const uploadedImages = ref([])
-const defaultImage = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2212%22%3E暂无图片%3C/text%3E%3C/svg%3E'
-
-const getImageUrl = (path) => {
-  if (!path) return defaultImage
-  if (path.startsWith('http')) return path
-  return IMAGE_BASE + path
-}
 
 const reviewForm = reactive({
   rating: 5,
   content: '',
   images: ''
 })
-
-const formatTime = (time) => {
-  if (!time) return ''
-  const date = new Date(time)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
 
 const fetchDish = async () => {
   const res = await api.get(`/dishes/${route.params.id}`)
@@ -131,6 +128,11 @@ const fetchDish = async () => {
 const fetchReviews = async () => {
   const res = await api.get(`/reviews/dish/${route.params.id}`)
   reviews.value = res.data || []
+}
+
+const fetchSmartReview = async () => {
+  const res = await api.get(`/dishes/${route.params.id}/smart-review`)
+  smartReview.value = res.data
 }
 
 const checkFavorite = async () => {
@@ -206,6 +208,7 @@ const submitReview = async () => {
     uploadedImages.value = []
     fileList.value = []
     fetchReviews()
+    fetchSmartReview()
     fetchDish()
   } catch (e) {
     console.error(e)
@@ -221,6 +224,91 @@ const previewImage = (url) => {
 onMounted(() => {
   fetchDish()
   fetchReviews()
+  fetchSmartReview()
   checkFavorite()
 })
 </script>
+
+<style scoped>
+.dish-detail {
+  display: flex;
+  gap: 20px;
+}
+
+.dish-detail-image {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.dish-detail-info {
+  flex: 1;
+}
+
+.dish-detail-name {
+  margin-bottom: 15px;
+}
+
+.dish-detail-price {
+  margin-bottom: 10px;
+}
+
+.price-large {
+  font-size: 24px;
+}
+
+.dish-detail-rating {
+  margin-bottom: 10px;
+}
+
+.rating-large {
+  font-size: 20px;
+}
+
+.rating-count {
+  color: #999;
+  margin-left: 10px;
+}
+
+.dish-detail-tags {
+  margin-bottom: 15px;
+}
+
+.dish-description {
+  color: #666;
+}
+
+.dish-actions {
+  margin-top: 15px;
+}
+
+.smart-review-content {
+  line-height: 1.8;
+  color: #444;
+}
+
+.review-username {
+  font-weight: 500;
+}
+
+.review-time {
+  color: #999;
+  font-size: 12px;
+}
+
+.review-like {
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .dish-detail {
+    flex-direction: column;
+  }
+
+  .dish-detail-image {
+    width: 100%;
+    height: 200px;
+  }
+}
+</style>

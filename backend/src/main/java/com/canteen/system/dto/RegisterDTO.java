@@ -16,4 +16,8 @@ public class RegisterDTO {
     @Pattern(regexp = "^$|^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
     private String email;
+    @NotBlank(message = "安全问题不能为空")
+    private String securityQuestion;
+    @NotBlank(message = "安全答案不能为空")
+    private String securityAnswer;
 }

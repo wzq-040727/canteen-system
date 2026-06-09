@@ -14,4 +14,5 @@ public interface ReviewService extends IService<Review> {
     PageResult<Review> getReviewPage(Long dishId, int pageNum, int pageSize);
     void deleteReview(Long id);
     void auditReview(Long id, Integer status);
+    List<Review> getRecentReviewsWithGroup(int limit);
 }

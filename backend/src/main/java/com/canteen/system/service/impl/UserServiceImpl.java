@@ -74,6 +74,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(BCrypt.hashpw(registerDTO.getPassword()));
         user.setRole(0);
         user.setStatus(1);
+        user.setSecurityQuestion(registerDTO.getSecurityQuestion());
+        user.setSecurityAnswer(registerDTO.getSecurityAnswer());
         this.save(user);
     }
     
@@ -141,6 +143,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new RuntimeException("原密码错误");
         }
         user.setPassword(BCrypt.hashpw(newPassword));
+        this.updateById(user);
+    }
+
+    @Override
+    public String getSecurityQuestion(String username) {
+        User user = this.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username));
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        if (user.getSecurityQuestion() == null || user.getSecurityQuestion().isEmpty()) {
+            throw new RuntimeException("该用户未设置安全问题");
+        }
+        return user.getSecurityQuestion();
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordDTO dto) {
+        User user = this.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, dto.getUsername()));
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        if (user.getSecurityAnswer() == null || !user.getSecurityAnswer().equals(dto.getSecurityAnswer())) {
+            throw new RuntimeException("安全答案错误");
+        }
+        user.setPassword(BCrypt.hashpw(dto.getNewPassword()));
         this.updateById(user);
     }
 }
