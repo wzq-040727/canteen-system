@@ -93,6 +93,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void updateUserInfo(User user) {
         User currentUser = getCurrentUser();
+        
+        if (user.getUsername() != null && !user.getUsername().equals(currentUser.getUsername())) {
+            Long count = this.count(new LambdaQueryWrapper<User>()
+                    .eq(User::getUsername, user.getUsername())
+                    .ne(User::getId, currentUser.getId()));
+            if (count > 0) {
+                throw new RuntimeException("用户名已存在");
+            }
+            currentUser.setUsername(user.getUsername());
+        }
+        
+        if (user.getStudentId() != null && !user.getStudentId().equals(currentUser.getStudentId())) {
+            if (!user.getStudentId().isEmpty()) {
+                Long count = this.count(new LambdaQueryWrapper<User>()
+                        .eq(User::getStudentId, user.getStudentId())
+                        .ne(User::getId, currentUser.getId()));
+                if (count > 0) {
+                    throw new RuntimeException("学号已被其他用户使用");
+                }
+            }
+            currentUser.setStudentId(user.getStudentId());
+        }
+        
+        if (user.getPhone() != null && !user.getPhone().equals(currentUser.getPhone())) {
+            if (!user.getPhone().isEmpty()) {
+                Long count = this.count(new LambdaQueryWrapper<User>()
+                        .eq(User::getPhone, user.getPhone())
+                        .ne(User::getId, currentUser.getId()));
+                if (count > 0) {
+                    throw new RuntimeException("手机号已被其他用户使用");
+                }
+            }
+            currentUser.setPhone(user.getPhone());
+        }
+        
         currentUser.setRealName(user.getRealName());
         currentUser.setEmail(user.getEmail());
         currentUser.setAvatar(user.getAvatar());

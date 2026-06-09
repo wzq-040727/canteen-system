@@ -15,6 +15,7 @@
               </div>
             </div>
             <div class="dish-tags">
+              <span class="tag canteen-tag" v-if="dish.canteenName">来自{{ dish.canteenName }}</span>
               <span class="tag" v-if="dish.category">{{ dish.category }}</span>
               <span class="tag" v-if="dish.taste">{{ dish.taste }}</span>
             </div>

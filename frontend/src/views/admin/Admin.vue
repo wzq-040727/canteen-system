@@ -53,6 +53,7 @@
     <div class="card" style="margin-top: 20px;">
       <div class="card-title">快捷入口</div>
       <el-space wrap>
+        <el-button type="primary" @click="$router.push('/admin/canteens')">食堂管理</el-button>
         <el-button type="primary" @click="$router.push('/admin/dishes')">菜品管理</el-button>
         <el-button type="primary" @click="$router.push('/admin/reviews')">评价管理</el-button>
         <el-button type="primary" @click="$router.push('/admin/users')">用户管理</el-button>
