@@ -13,6 +13,7 @@ uploads/
 .env
 .env.local
 .env.*.local
+backend/src/main/resources/application.yml
 
 # IDE配置
 .idea/

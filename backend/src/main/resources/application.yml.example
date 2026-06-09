@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/canteen_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password: ${DB_PASSWORD:你的数据库密码}
   data:
     redis:
       host: localhost
@@ -30,8 +30,8 @@ server:
   port: 8080
 
 jwt:
-  secret: canteen-system-jwt-secret-key-for-graduation-project-2024
+  secret: ${JWT_SECRET:你的JWT密钥}
   expiration: 86400000
 
 file:
-  upload-path: e:/毕设/canteen-system/uploads/
+  upload-path: ${UPLOAD_PATH:你的上传路径}
