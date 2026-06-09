@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 校园食堂智能点评与推荐系统 - A Spring Boot + Vue.js canteen review and recommendation system with user authentication, dish browsing, reviews, favorites, and personalized recommendations.
 
+## Git Repository Structure
+
+`canteen-system/` 是独立 git 仓库（不是 submodule）。父目录 `E:/毕设` 也有自己的 git 仓库。
+
+- 代码在 `canteen-system/` 子目录
+- code-review-graph 等工具必须用 `repo_root=E:/毕设/canteen-system`，不能用 `E:/毕设`
+
 ## Build Commands
 
 ### Backend (canteen-system/backend/)
@@ -39,7 +46,7 @@ backend/src/main/java/com/canteen/system/
 ├── mapper/         # MyBatis-Plus data access
 ├── entity/         # Database entities (@TableName)
 ├── dto/            # Data transfer objects (Result, PageResult, DTOs)
-├── config/         # JWT filter, Web config, MyBatis-Plus config
+├── config/         # JWT filter, Web config, MyBatis-Plus config, JacksonConfig
 ├── annotation/     # Custom @RequireAdmin for authorization
 ├── aspect/         # AOP aspects for @RequireAdmin
 ├── util/           # JwtUtil, UserContext for auth
@@ -50,10 +57,13 @@ backend/src/main/java/com/canteen/system/
 ```
 frontend/src/
 ├── views/          # Page components (Home, Login, Dish, etc.)
-├── views/admin/    # Admin panel (Dishes, Reviews, Users)
+├── views/admin/    # Admin panel (Admin, Canteens, Dishes, Reviews, Users, Announcements)
+├── components/     # Reusable components (SkeletonLoader, CardSkeleton, DishCardSkeleton)
 ├── router/         # Vue Router with auth guards (requiresAuth, requiresAdmin)
 ├── stores/user.js  # Pinia store: user, token, isAdmin, login/logout
-└── utils/api.js    # Axios instance with JWT interceptor
+└── utils/
+    ├── api.js      # Axios instance with JWT interceptor
+    └── helpers.js  # getImageUrl, formatTime, defaultImage
 ```
 
 ### Key Patterns
@@ -78,15 +88,33 @@ router.beforeEach checks useUserStore().isLoggedIn and .isAdmin
 
 **User Roles:**
 - Role 0: Student (普通用户)
-- Role 1: System Admin (系统管理员)
-- Role 2: Canteen Admin (食堂管理员)
+- Role 1: Canteen Admin (食堂管理员)
+- Role 2: System Admin (系统管理员)
+
+**Key Entities (extended):**
+- `Canteen` — 新增 `floorCount` (楼层数)；`status` 支持动态判断（0=手动关闭，1=根据 `openingHours` 自动判断当前是否营业中）
+- `Window` — 新增 `floor` (所在楼层), `openTime`/`closeTime` (营业时间)
+- `User` — 新增 `securityQuestion`/`securityAnswer` (忘记密码安全问题)
+- `Dish` — 新增 `floor` 临时字段（来自 Window 表），菜品来源显示格式：`来自XX食堂X楼XX窗口`
+- `Announcement` — 食堂公告，关联 `canteenId`，支持置顶和有效期
+
+**Key API Endpoints (new):**
+- `GET /api/windows/canteen/{id}/floors` — 获取食堂楼层列表
+- `GET /api/windows/canteen/{id}?floor=N` — 按楼层筛选窗口
+- `POST/PUT/DELETE /api/windows` — 窗口 CRUD (@RequireAdmin)
+- `GET /api/auth/security-question?username=` — 获取安全问题
+- `POST /api/auth/reset-password` — 重置密码
+- `POST /api/dishes/import` — Excel 批量导入菜品 (@RequireAdmin)
+- `GET /api/reviews/recent-grouped` — 按食堂-楼层-窗口分组的评价
+- `GET/POST/PUT/DELETE /api/announcements` — 公告管理
+- `GET /api/announcements` — 获取全部有效公告（跨食堂）
+- `GET /api/dishes/categories` — 获取菜品分类及数量统计
 
 ## Configuration
 
 - **Backend port:** 8080
 - **Frontend port:** 3001 (proxies /api and /uploads to backend)
 - **Database:** MySQL 8.0, `canteen_db`
-- **Redis:** localhost:6379 (optional, for caching)
 - **File uploads:** `e:/毕设/canteen-system/uploads/`
 
 ## Test Accounts
@@ -99,8 +127,49 @@ router.beforeEach checks useUserStore().isLoggedIn and .isAdmin
 
 ## Development Notes
 
-1. **Import order for Vue files:** Vue APIs → Router/Pinia → Element Plus → utils → styles
-2. **Use `<script setup>` syntax** for all Vue components
-3. **Form validation:** Use `el-form` with `rules` prop
-4. **API calls:** Use the `api` instance from `utils/api.js`, not raw axios
-5. **Lombok is available** - use `@Data`, `@RequiredArgsConstructor`, etc.
+### Frontend Conventions
+
+**Import order:** Vue APIs → Router/Pinia → Element Plus → utils → styles
+
+**Naming:**
+- 组件文件: PascalCase（`UserLogin.vue`）
+- 变量/函数: camelCase（`userList`, `handleLogin`）
+- CSS 类: kebab-case（`.login-container`）
+
+**Rules:**
+- Use `<script setup>` syntax for all Vue components
+- Form validation: use `el-form` with `rules` prop
+- API calls: use the `api` instance from `utils/api.js`, not raw axios
+
+### Backend Conventions
+
+**Controller pattern:**
+```java
+@RestController
+@RequestMapping("/api/dishes")
+@RequiredArgsConstructor
+public class DishController {
+    private final DishService dishService;
+
+    @GetMapping
+    public Result<PageResult<Dish>> query(DishQueryDTO queryDTO) {
+        return Result.success(dishService.queryDishes(queryDTO));
+    }
+
+    @PostMapping
+    @RequireAdmin(message = "需要管理员权限")
+    public Result<Void> addDish(@RequestBody DishDTO dishDTO) {
+        dishService.addDish(dishDTO);
+        return Result.success();
+    }
+}
+```
+
+**Naming:** Entity: `User.java`, DTO: `LoginDTO.java`, 方法: `queryDishes`, `getDetailById`
+
+**UserContext:**
+```java
+Long userId = UserContext.getCurrentUserId();
+```
+
+**Lombok:** available — use `@Data`, `@RequiredArgsConstructor`, etc.

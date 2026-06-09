@@ -1,0 +1,45 @@
+# ==================== 依赖 ====================
+node_modules/
+package-lock.json
+
+# ==================== IDE 配置 ====================
+.idea/
+.vscode/
+.trae/
+.zed/
+.workbuddy/
+.reasonix/
+
+# ==================== Claude Code 配置 ====================
+.claude/settings.json
+.claude/settings.local.json
+.claude/agents/
+.claude/skills/
+.claude/skills.json
+
+# ==================== Codex 配置 ====================
+.codex/
+
+# ==================== Agents 配置 ====================
+.agents/
+
+# ==================== Code Review Graph ====================
+.code-review-graph/
+
+# ==================== 备份 ====================
+_ecc-install-backup-*/
+
+# ==================== 独立子仓库 ====================
+canteen-system/
+
+# ==================== 毕设文档（二进制/临时文件） ====================
+毕设文档/*.docx
+毕设文档/*.doc
+毕设文档/*.pptx
+毕设文档/*.py
+毕设文档/*.txt
+毕设文档/figures/
+毕设文档/ppt_magazine/
+毕设文档/pptx_slides/
+毕设文档/参考文献/
+毕设文档/.claude/
