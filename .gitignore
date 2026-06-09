@@ -33,13 +33,4 @@ _ecc-install-backup-*/
 canteen-system/
 
 # ==================== 毕设文档（二进制/临时文件） ====================
-毕设文档/*.docx
-毕设文档/*.doc
-毕设文档/*.pptx
-毕设文档/*.py
-毕设文档/*.txt
-毕设文档/figures/
-毕设文档/ppt_magazine/
-毕设文档/pptx_slides/
-毕设文档/参考文献/
-毕设文档/.claude/
+毕设文档/
