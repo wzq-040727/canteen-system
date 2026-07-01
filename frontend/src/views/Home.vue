@@ -30,7 +30,12 @@
         </div>
         <div class="dish-grid" v-else-if="personalDishes.length">
           <div class="dish-card" v-for="dish in personalDishes" :key="dish.id" @click="$router.push(`/dish/${dish.id}`)">
-            <img :src="getImageUrl(dish.image)" class="dish-image" @error="$event.target.src=defaultImage">
+            <div class="dish-card-img-wrapper">
+              <img :src="getImageUrl(dish.image)" class="dish-image" loading="lazy" @error="$event.target.src=defaultImage">
+              <div class="dish-card-fav" @click.stop="toggleFav(dish)">
+                <el-icon :class="{ 'is-fav': dish.isFav }"><Star /></el-icon>
+              </div>
+            </div>
             <div class="dish-info">
               <div class="dish-name">{{ dish.name }}</div>
               <div class="dish-meta">
@@ -55,11 +60,16 @@
       <div id="top-dishes" class="card">
         <div class="card-title">🔥 热门推荐</div>
         <div class="dish-grid" v-if="loading">
-          <DishCardSkeleton v-for="i in 12" :key="i" />
+          <DishCardSkeleton v-for="i in 6" :key="i" />
         </div>
         <div class="dish-grid" v-else-if="topDishes.length">
           <div class="dish-card" v-for="dish in topDishes" :key="dish.id" @click="$router.push(`/dish/${dish.id}`)">
-            <img :src="getImageUrl(dish.image)" class="dish-image" @error="$event.target.src=defaultImage">
+            <div class="dish-card-img-wrapper">
+              <img :src="getImageUrl(dish.image)" class="dish-image" loading="lazy" @error="$event.target.src=defaultImage">
+              <div class="dish-card-fav" @click.stop="toggleFav(dish)">
+                <el-icon :class="{ 'is-fav': dish.isFav }"><Star /></el-icon>
+              </div>
+            </div>
             <div class="dish-info">
               <div class="dish-name">{{ dish.name }}</div>
               <div class="dish-meta">
@@ -147,7 +157,7 @@
               <div class="review-item" v-for="review in group.reviews" :key="review.id">
                 <div class="review-header">
                   <div class="review-user">
-                    <div class="review-avatar">{{ (review.userName || '用户').charAt(0) }}</div>
+                <div class="review-avatar" :style="{ background: getAvatarColor(review.userName) }">{{ (review.userName || '用户').charAt(0) }}</div>
                     <div>
                       <div class="review-username">{{ review.userName }}</div>
                       <div class="review-time">{{ formatTime(review.createdTime) }}</div>
@@ -165,6 +175,9 @@
         </div>
         <el-empty v-else description="暂无评价" />
       </div>
+
+      <!-- 回到顶部 -->
+      <el-backtop :right="40" :bottom="40" />
     </div>
   </div>
 </template>
@@ -172,12 +185,15 @@
 <script setup>
 import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
 import { useUserStore } from '../stores/user'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import api from '../utils/api'
 import { getImageUrl, formatTime, defaultImage } from '../utils/helpers'
 import DishCardSkeleton from '../components/DishCardSkeleton.vue'
-import { Top } from '@element-plus/icons-vue'
+import { Top, Star } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
+const router = useRouter()
 
 const topDishes = ref([])
 const personalDishes = ref([])
@@ -188,6 +204,29 @@ const announcements = ref([])
 const loading = ref(true)
 const personalLoading = ref(true)
 const activeSection = ref('')
+
+// 头像随机颜色
+const getAvatarColor = (name) => {
+  const colors = ['#667eea', '#f56c6c', '#67c23a', '#e6a23c', '#909399', '#764ba2']
+  let hash = 0
+  for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+// 收藏/取消收藏
+const toggleFav = async (dish) => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    return router.push('/login')
+  }
+  try {
+    await api.post('/favorites', { dishId: dish.id })
+    dish.isFav = !dish.isFav
+    ElMessage.success(dish.isFav ? '已收藏' : '已取消收藏')
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 const groupedReviews = computed(() => {
   const groups = {}
@@ -423,6 +462,11 @@ onUnmounted(() => {
   font-size: 13px;
   color: #666;
   line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* 评价多列 */
@@ -535,6 +579,15 @@ onUnmounted(() => {
 
   .home-layout {
     display: block;
+  }
+
+  .dish-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .dish-image {
+    height: 100px;
   }
 
   .reviews-grid {

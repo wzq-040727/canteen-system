@@ -1,8 +1,6 @@
 package com.canteen.system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.canteen.system.dto.PageResult;
 import com.canteen.system.dto.Result;
 import com.canteen.system.entity.Review;
 import com.canteen.system.mapper.ReviewMapper;

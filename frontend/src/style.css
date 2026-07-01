@@ -179,7 +179,36 @@ a {
 
 .dish-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+}
+
+.dish-card-img-wrapper {
+  position: relative;
+}
+
+.dish-card-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  color: #ccc;
+}
+
+.dish-card-fav:hover {
+  transform: scale(1.1);
+}
+
+.dish-card-fav .is-fav {
+  color: #ff6b6b;
 }
 
 .dish-image {

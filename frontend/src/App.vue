@@ -3,7 +3,13 @@
     <header class="header">
       <h1 class="header-title" @click="$router.push('/')">🍽️ 校园食堂智能点评与推荐系统</h1>
       <div class="header-search" @click="$router.push('/search')">
-        <el-icon><Search /></el-icon>
+        <el-input
+          placeholder="搜索菜品、食堂..."
+          prefix-icon="Search"
+          size="small"
+          style="width: 260px; border-radius: 20px;"
+          readonly
+        />
       </div>
       <div class="header-right">
         <template v-if="userStore.isLoggedIn">
